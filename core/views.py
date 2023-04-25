@@ -1,6 +1,10 @@
 from django.shortcuts import render
-
+from product.models import Product
 
 # frontend page
+
+
 def frontpage(request):
-    return render(request, 'core/index.html')
+    products = Product.objects.all()[:8]
+    return render(request, 'core/index.html', {'products': products})
+
