@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     # project app
     'core',
     'product',
-    'cart,'
+    'cart',
 ]
 
 MIDDLEWARE = [
