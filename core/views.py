@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from product.models import Product
-
+from .forms import UserRegisterForm
+from django.contrib.auth import login
 # frontend page
 
 
@@ -10,8 +11,12 @@ def frontpage(request):
 
 
 def register_user(request):
+    ''' Here Not needed to send form to user page - register'''
+    if request.method == 'POST':
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('core:frontpage')
+
     return render(request, 'core/register.html')
-
-
-def login_user(request):
-    return render(request, 'core/login.html')
