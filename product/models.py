@@ -1,4 +1,8 @@
 from django.db import models
+from django.core.files import File
+
+from io import BytesIO
+from PIL import Image
 
 
 class Category(models.Model):
@@ -18,6 +22,10 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField()
     content = models.TextField(blank=True, null=True)
+    image = models.ImageField(
+        upload_to='product_images/', blank=True, null=True)
+    thumbnail = models.ImageField(
+        upload_to='product_images/', blank=True, null=True)
     price = models.DecimalField(max_digits=4, decimal_places=2)
     create_at = models.DateTimeField(auto_now_add=True)
 
@@ -26,3 +34,27 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_thumbnail(self):
+        if self.thumbnail:
+            return self.thumbnail.url
+        else:
+            if self.image:
+                self.thumbnail = self.make_thumbnail(self.image)
+                self.save()
+
+                return self.thumbnail.url
+            else:
+                return 'https://via.placeholder.com/240x240.jpg'
+
+    def make_thumbnail(self, image, size=(300, 300)):
+        img = Image.open(image)
+        img.convert('RGB')
+        img.thumbnail(size)
+
+        thumb_io = BytesIO()
+        img.save(thumb_io, 'JPEG', quality=85)
+
+        thumbnail = File(thumb_io, name=image.name)
+
+        return thumbnail
