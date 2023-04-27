@@ -31,17 +31,27 @@ class Cart(object):
         if product_id in self.cart:
             del self.cart[product_id]
             self.save()
-    # to iter all item in cart session
 
     def __iter__(self):
+        ''' to iter all item in cart session '''
         for p in self.cart.keys():
             self.cart[str(p)]['product'] = Product.objects.get(pk=p)
 
-    # return all quantity in cart session
+        for item in self.cart.values():
+            item['total_price'] = item['product'].price * item['quantity']
+            yield item
+
     def __len__(self):
+        '''  return all quantity in cart session '''
         return sum(item['quantity'] for item in self.cart.values())
 
-    # to save item in cart session
     def save(self):
+        ''' to save item in cart session '''
         self.session[settings.CART_SESSION_ID] = self.cart
         self.session.modified = True
+
+    def get_total_cost(self):
+        ''' get total cost for all item in cart '''
+        for p in self.cart.keys():
+            self.cart[str(p)]['product'] = Product.objects.get(pk=p)
+        return sum(item['product'].price * item['quantity'] for item in self.cart.values())
