@@ -32,7 +32,7 @@ def update_cart(request, product_id, action):
     else:
         cart.add(product_id, -1, True)
     product = get_object_or_404(Product, pk=product_id)
-    quantity = cart.get_item(item=product_id)['quantity']
+    quantity = cart.get_item(product_id)['quantity']
     item = {
         'product': {
             'id': product.id,
@@ -44,7 +44,7 @@ def update_cart(request, product_id, action):
         'total_price': quantity * product.price,
         'quantity': quantity
     }
-    response = render(request, 'cart/partials/cart_item/html', {'item': item})
+    response = render(request, 'cart/partials/cart_item.html', {'item': item})
     response['HX-Trigger'] = 'update-menu-cart'
     return response
 
